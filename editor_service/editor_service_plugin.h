@@ -1,0 +1,22 @@
+#ifndef EDITORSERVICEPLUGIN_H
+#define EDITORSERVICEPLUGIN_H
+
+#include "tools/editor/editor_plugin.h"
+#include "editor_server.h"
+
+namespace gdexplorer {
+	class EditorServicePlugin : public EditorPlugin
+	{
+		OBJ_TYPE(EditorServicePlugin, EditorPlugin);
+		EditorNode *editor;
+		EditorServer *server;
+	protected:
+		void _notification(int p_what);
+	public:
+		EditorServicePlugin(EditorNode* editor);
+		~EditorServicePlugin();
+	};
+}
+
+
+#endif // EDITORSERVICEPLUGIN_H
