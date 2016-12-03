@@ -1,9 +1,11 @@
-#ifndef EDITORSERVER_H
-#define EDITORSERVER_H
+#ifndef GD_EXPLORER_EDITORSERVER_H
+#define GD_EXPLORER_EDITORSERVER_H
 
 #include <core/object.h>
 #include <os/thread.h>
 #include <io/tcp_server.h>
+#include "services/service.h"
+#include <map>
 
 namespace gdexplorer {
 
@@ -83,6 +85,7 @@ namespace gdexplorer {
 		};
 
 	private:
+		std::map<String, Service> services;
 		Ref<TCP_Server> server;
 		Set<Thread*> to_wait;
 		Mutex *wait_mutex;
@@ -91,7 +94,6 @@ namespace gdexplorer {
 		bool quit;
 		int port;
 		bool active;
-
 	private:
 		static void _close_client(ClientData *cd);
 		static void _subthread_start(void *s);
@@ -102,9 +104,10 @@ namespace gdexplorer {
 		void start();
 		void stop() { cmd = CMD_STOP; }
 		bool is_active() const { return active; }
+		void register_service(const String& action, const Service& service);
 		EditorServer();
 		~EditorServer();
 	};
 }
 
-#endif // EDITORSERVER_H
+#endif // GD_EXPLORER_EDITORSERVER_H

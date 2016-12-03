@@ -1,5 +1,5 @@
-#ifndef EDITORSERVICEPLUGIN_H
-#define EDITORSERVICEPLUGIN_H
+#ifndef GD_EXPLORER_EDITORSERVICEPLUGIN_H
+#define GD_EXPLORER_EDITORSERVICEPLUGIN_H
 
 #include "tools/editor/editor_plugin.h"
 #include "editor_server.h"
@@ -19,4 +19,4 @@ namespace gdexplorer {
 }
 
 
-#endif // EDITORSERVICEPLUGIN_H
+#endif // GD_EXPLORER_EDITORSERVICEPLUGIN_H

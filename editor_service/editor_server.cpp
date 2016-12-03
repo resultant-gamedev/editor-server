@@ -107,7 +107,6 @@ namespace gdexplorer {
 							// Read and parse body as json
 							Dictionary data;
 							Error parse_err = data.parse_json(request.read_utf8_body());
-
 							if (parse_err != OK) {
 								request.response.status = "400 Bad Request";
 								request.response.set_header("Accept", "application/json");
@@ -115,9 +114,18 @@ namespace gdexplorer {
 								request.send_response();
 								break;
 							}
+							if (!data.has("action")) {
+								data["error"] = "No action found in the request body";
+							}
+							else {
+								auto services = cd->server->services;
+								if(services.find(data["action"]) == services.end())
+									data["error"] = "No service found for the action";
+								else {
+									data = services[data["action"]].resolve(data);
+								}
+							}
 
-							// TODO: Fill respose content here
-							data["hello"]="world";
 
 							// Done! Deliver <3
 							request.response.status = "200 OK";
@@ -234,6 +242,12 @@ namespace gdexplorer {
 		cmd = CMD_ACTIVATE;
 	}
 
+	void EditorServer::register_service(const String &action, const Service &service) {
+		if(action.length()) {
+			services[action] = service;
+		}
+	}
+
 	EditorServer::EditorServer() {
 		server = TCP_Server::create_ref();
 		wait_mutex = Mutex::create();
@@ -249,5 +263,6 @@ namespace gdexplorer {
 		memdelete(thread);
 		memdelete(wait_mutex);
 	}
+
 }
 
