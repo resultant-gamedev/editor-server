@@ -62,7 +62,7 @@ namespace gdexplorer {
 
 			void send_response(const String& p_body=String()) {
 				String resp = "HTTP/1.1 " + response.status + "\r\n";
-				resp += "server: Editor Service\r\n";
+				resp += "server: Godot Editor Server\r\n";
 
 				for (Map<String, String>::Element *E=response.header.front(); E; E=E->next()) {
 					resp += E->key() + ": " + E->value() + "\r\n";

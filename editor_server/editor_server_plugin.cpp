@@ -1,9 +1,9 @@
-#include "editor_service_plugin.h"
+#include "editor_server_plugin.h"
 #include "services/service.h"
 #include <tools/editor/editor_settings.h>
 
 namespace gdexplorer {
-	EditorServicePlugin::EditorServicePlugin(EditorNode* pEditor): editor(pEditor) {
+	EditorServerPlugin::EditorServerPlugin(EditorNode* pEditor): editor(pEditor) {
 		server = memnew(EditorServer);
 		server->register_service("echo", memnew(EditorServerService));
 		auto port = EditorSettings::get_singleton()->get("network/editor_server_port");
@@ -15,11 +15,11 @@ namespace gdexplorer {
 		Globals::get_singleton()->add_singleton( Globals::Singleton("EditorServer", server));
 	}
 
-	EditorServicePlugin::~EditorServicePlugin() {
+	EditorServerPlugin::~EditorServerPlugin() {
 		memdelete(server);
 	}
 
-	void EditorServicePlugin::_notification(int p_what) {
+	void EditorServerPlugin::_notification(int p_what) {
 		switch (p_what) {
 			case NOTIFICATION_ENTER_TREE: {
 					auto port = EditorSettings::get_singleton()->get("network/editor_server_port");
@@ -41,8 +41,8 @@ namespace gdexplorer {
 		}
 	}
 
-	void EditorServicePlugin::_bind_methods() {
-		ObjectTypeDB::bind_method(_MD("_notification","p_what"),&EditorServicePlugin::_notification);
+	void EditorServerPlugin::_bind_methods() {
+		ObjectTypeDB::bind_method(_MD("_notification","p_what"),&EditorServerPlugin::_notification);
 	}
 }
 

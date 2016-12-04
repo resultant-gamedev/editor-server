@@ -14,7 +14,7 @@ namespace gdexplorer {
 		EditorServerService() = default;
 		virtual ~EditorServerService() = default;
 		EditorServerService& operator=(EditorServerService&) = default;
-		virtual Dictionary resolve(const Dictionary& data) const { return data; }
+		virtual Dictionary resolve(const Dictionary& data) const;
 	};
 
 }

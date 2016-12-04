@@ -6,9 +6,9 @@
 
 namespace gdexplorer {
 
-	class EditorServicePlugin : public EditorPlugin
+	class EditorServerPlugin : public EditorPlugin
 	{
-		OBJ_TYPE(EditorServicePlugin, EditorPlugin);
+		OBJ_TYPE(EditorServerPlugin, EditorPlugin);
 		EditorNode *editor;
 		EditorServer *server;
 		Vector<Variant> m_notificationParam;
@@ -16,8 +16,8 @@ namespace gdexplorer {
 		void _notification(int p_what);
 		static void _bind_methods();
 	public:
-		EditorServicePlugin(EditorNode* editor);
-		~EditorServicePlugin();
+		EditorServerPlugin(EditorNode* editor);
+		~EditorServerPlugin();
 	};
 }
 

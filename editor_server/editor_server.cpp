@@ -124,7 +124,7 @@ namespace gdexplorer {
 								else {
 									Ref<EditorServerService>& service = services[data["action"]];
 									if(!service.is_null()) {
-										data = service->call("resolve", data);
+										data = service->resolve(data);
 									}
 								}
 							}
@@ -196,7 +196,7 @@ namespace gdexplorer {
 	}
 
 	void EditorServer::_bind_methods() {
-		ObjectTypeDB::bind_method(_MD("register_service","action", "service"),&EditorServer::register_service);
+		ObjectTypeDB::bind_method(_MD("register_service", "action:String", "service:EditorServerService"), &EditorServer::register_service);
 	}
 
 	void EditorServer::start(int port) {
