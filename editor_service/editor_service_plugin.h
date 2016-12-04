@@ -5,6 +5,7 @@
 #include "editor_server.h"
 
 namespace gdexplorer {
+
 	class EditorServicePlugin : public EditorPlugin
 	{
 		OBJ_TYPE(EditorServicePlugin, EditorPlugin);

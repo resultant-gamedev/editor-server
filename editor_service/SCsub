@@ -3,6 +3,7 @@ Import('env')
 
 if env['tools'] == 'yes' and env['gdscript'] == 'yes':
     env.Append(CPPDEFINES=['EDITOR_SERVICE'])
-    env.add_source_files(env.modules_sources,'*.cpp')
+    env.add_source_files(env.modules_sources, '*.cpp')
+    env.add_source_files(env.modules_sources, 'services/*.cpp')
 else:
-    env.add_source_files(env.modules_sources,'register_types.cpp')
+    env.add_source_files(env.modules_sources, 'register_types.cpp')

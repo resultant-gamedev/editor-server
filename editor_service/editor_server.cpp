@@ -122,7 +122,10 @@ namespace gdexplorer {
 								if(services.find(data["action"]) == services.end())
 									data["error"] = "No service found for the action";
 								else {
-									data = services[data["action"]].resolve(data);
+									Ref<EditorServerService>& service = services[data["action"]];
+									if(!service.is_null()) {
+										data = service->call("resolve", data);
+									}
 								}
 							}
 
@@ -192,6 +195,10 @@ namespace gdexplorer {
 		}
 	}
 
+	void EditorServer::_bind_methods() {
+		ObjectTypeDB::bind_method(_MD("register_service","action", "service"),&EditorServer::register_service);
+	}
+
 	void EditorServer::start(int port) {
 		this->port = port;
 		cmd = CMD_ACTIVATE;
@@ -201,7 +208,7 @@ namespace gdexplorer {
 		cmd = CMD_STOP;
 	}
 
-	void EditorServer::register_service(const String &action, const Service &service) {
+	void EditorServer::register_service(const String &action, const Ref<EditorServerService>& service) {
 		if(action.length()) {
 			services[action] = service;
 		}
@@ -222,6 +229,7 @@ namespace gdexplorer {
 		Thread::wait_to_finish(thread);
 		memdelete(thread);
 		memdelete(wait_mutex);
+		services.clear();
 	}
 
 }

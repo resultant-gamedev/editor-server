@@ -3,16 +3,16 @@
 #include <tools/editor/editor_settings.h>
 
 namespace gdexplorer {
-
 	EditorServicePlugin::EditorServicePlugin(EditorNode* pEditor): editor(pEditor) {
 		server = memnew(EditorServer);
-		server->register_service("echo", Service());
+		server->register_service("echo", memnew(EditorServerService));
 		auto port = EditorSettings::get_singleton()->get("network/editor_server_port");
 		if (port.get_type() == Variant::NIL || !port.is_num())
 			port = 6570;
 		EditorSettings::get_singleton()->set("network/editor_server_port", port);
 		m_notificationParam.push_back(EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED);
 		EditorSettings::get_singleton()->connect("settings_changed", this, "_notification", m_notificationParam);
+		Globals::get_singleton()->add_singleton( Globals::Singleton("EditorServer", server));
 	}
 
 	EditorServicePlugin::~EditorServicePlugin() {

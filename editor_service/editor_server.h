@@ -85,7 +85,7 @@ namespace gdexplorer {
 		};
 
 	private:
-		std::map<String, Service> services;
+		std::map<String, Ref<EditorServerService>> services;
 		Ref<TCP_Server> server;
 		Set<Thread*> to_wait;
 		Mutex *wait_mutex;
@@ -99,12 +99,15 @@ namespace gdexplorer {
 		static void _subthread_start(void *s);
 		static void _thread_start(void *s);
 
+	protected:
+		static void _bind_methods();
+
 	public:
 		void start(int port);
 		void stop();
 		bool is_active() const { return active; }
 		int get_port() const { return port; }
-		void register_service(const String& action, const Service& service);
+		void register_service(const String& action, const Ref<EditorServerService>& service);
 		EditorServer();
 		~EditorServer();
 	};
