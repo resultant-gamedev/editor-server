@@ -10,8 +10,10 @@ namespace gdexplorer {
 		OBJ_TYPE(EditorServicePlugin, EditorPlugin);
 		EditorNode *editor;
 		EditorServer *server;
+		Vector<Variant> m_notificationParam;
 	protected:
 		void _notification(int p_what);
+		static void _bind_methods();
 	public:
 		EditorServicePlugin(EditorNode* editor);
 		~EditorServicePlugin();

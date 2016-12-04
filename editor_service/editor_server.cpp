@@ -152,20 +152,18 @@ namespace gdexplorer {
 
 		while(!self->quit) {
 			if (self->cmd == CMD_ACTIVATE) {
-				int port_max = self->port + 10;
-				// find out the best port to listen
-				while (self->port < port_max) {
-					if (self->server->listen(self->port)==OK) {
-						self->active = true;
-						self->cmd = CMD_NONE;
-						self->_add_to_servers_list();
-						break;
-					}
-					self->port++;
+				self->server->stop();
+				self->active = false;
+				self->cmd = CMD_NONE;
+				if (self->server->listen(self->port) == OK) {
+					self->active = true;
+					print_line(String("[Editor Server]Server port started at:") + itos(self->port));
 				}
-				if (!self->active)
-					self->quit = true;
-			} else if (self->cmd == CMD_STOP) {
+				else {
+					ERR_PRINTS(String("[Editor Server]Error open port: ") + itos(self->port));
+				}
+			}
+			else if (self->cmd == CMD_STOP) {
 				self->server->stop();
 				self->active = false;
 				self->cmd = CMD_NONE;
@@ -194,52 +192,13 @@ namespace gdexplorer {
 		}
 	}
 
-	void EditorServer::_add_to_servers_list() {
-		String serversPath = EditorSettings::get_singleton()->get_settings_path() + "/.editor-servers.json";
-		Dictionary serversList;
-
-		FileAccess *f_read=FileAccess::open(serversPath,FileAccess::READ);
-		if (f_read) {
-			String text;
-			String l = f_read->get_line();
-			while(!f_read->eof_reached()) {
-				text+=l+"\n";
-				l = f_read->get_line();
-			}
-			text+=l;
-
-			serversList.parse_json(text);
-			f_read->close();
-			memdelete(f_read);
-		}
-
-		FileAccess *f_write = FileAccess::open(serversPath,FileAccess::WRITE);
-		if (f_write) {
-			String serverPort = String::num(port);
-
-			if (!serversList.empty()) {
-				Array keys = serversList.keys();
-				for (int i = 0; i < keys.size(); i++) {
-					String md5path = keys[i];
-					if (serversList[md5path] == serverPort) {
-						serversList.erase(md5path);
-						break;
-					}
-				}
-			}
-
-			serversList[Globals::get_singleton()->get_resource_path().md5_text()] = serverPort;
-
-			f_write->store_string(serversList.to_json());
-			f_write->close();
-			memdelete(f_write);
-		}
+	void EditorServer::start(int port) {
+		this->port = port;
+		cmd = CMD_ACTIVATE;
 	}
 
-	void EditorServer::start() {
-		stop();
-		port = 6070;
-		cmd = CMD_ACTIVATE;
+	void EditorServer::stop() {
+		cmd = CMD_STOP;
 	}
 
 	void EditorServer::register_service(const String &action, const Service &service) {
@@ -254,6 +213,7 @@ namespace gdexplorer {
 		quit = false;
 		active = false;
 		cmd = CMD_NONE;
+		port = 6570;
 		thread = Thread::create(_thread_start, this);
 	}
 

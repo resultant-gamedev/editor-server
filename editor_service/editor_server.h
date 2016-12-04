@@ -98,12 +98,12 @@ namespace gdexplorer {
 		static void _close_client(ClientData *cd);
 		static void _subthread_start(void *s);
 		static void _thread_start(void *s);
-		void _add_to_servers_list();
 
 	public:
-		void start();
-		void stop() { cmd = CMD_STOP; }
+		void start(int port);
+		void stop();
 		bool is_active() const { return active; }
+		int get_port() const { return port; }
 		void register_service(const String& action, const Service& service);
 		EditorServer();
 		~EditorServer();
