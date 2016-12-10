@@ -1,11 +1,17 @@
 #include "editor_server_plugin.h"
 #include "services/service.h"
 #include <tools/editor/editor_settings.h>
+#include "services/editor_action_service.h"
+#include "services/code_complete_service.h"
 
 namespace gdexplorer {
 	EditorServerPlugin::EditorServerPlugin(EditorNode* pEditor): editor(pEditor) {
 		server = memnew(EditorServer);
+		// Register default services
 		server->register_service("echo", memnew(EditorServerService));
+		server->register_service("editor", memnew(EditorActionService));
+		server->register_service("codecomplete", memnew(CodeCompleteService));
+
 		auto port = EditorSettings::get_singleton()->get("network/editor_server_port");
 		if (port.get_type() == Variant::NIL || !port.is_num())
 			port = 6570;

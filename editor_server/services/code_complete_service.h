@@ -2,12 +2,15 @@
 #define CODECOMPLETESERVICE_H
 
 #include "service.h"
+#include "modules/gdscript/gd_script.h"
 
 namespace gdexplorer {
 	class CodeCompleteService : public EditorServerService
 	{
 		OBJ_TYPE(CodeCompleteService,EditorServerService);
 		using super = EditorServerService;
+	protected:
+		mutable List<String> keywords;
 	public:
 		struct Request {
 			bool valid() const;
@@ -27,7 +30,7 @@ namespace gdexplorer {
 
 	public:
 		virtual Dictionary resolve(const Dictionary& _data) const override;
-		CodeCompleteService() = default;
+		CodeCompleteService();
 		virtual ~CodeCompleteService() = default;
 	};
 }
