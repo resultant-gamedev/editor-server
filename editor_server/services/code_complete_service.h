@@ -2,7 +2,6 @@
 #define CODECOMPLETESERVICE_H
 
 #include "service.h"
-#include "modules/gdscript/gd_script.h"
 
 namespace gdexplorer {
 	class CodeCompleteService : public EditorServerService

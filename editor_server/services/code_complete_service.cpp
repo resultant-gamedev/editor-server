@@ -1,11 +1,14 @@
 #include "code_complete_service.h"
 #include <core/os/file_access.h>
-#include "io/resource_loader.h"
-#include "globals.h"
-#include "modules/gdscript/gd_script.h"
+#include <io/resource_loader.h>
+#include <core/globals.h>
 #include <tools/editor/editor_node.h>
 #include <core/list.h>
-#include <set>
+#include <initializer_list>
+
+#ifdef GDSCRIPT_ENABLED
+#include "modules/gdscript/gd_script.h"
+#endif
 
 namespace gdexplorer {
 
@@ -35,8 +38,9 @@ namespace gdexplorer {
 	}
 
 	CodeCompleteService::CodeCompleteService() {
-		// Fill keywords
+#ifdef GDSCRIPT_ENABLED
 		GDScriptLanguage::get_singleton()->get_reserved_words(&keywords);
+#endif
 		for(const String& _keyword : {
 			"Vector2", "Vector3","Plane","Quat","AABB","Matrix3","Transform", "Color",
 			"Image","InputEvent","Rect2","NodePath"}){
@@ -47,7 +51,6 @@ namespace gdexplorer {
 		for(List<StringName>::Element *E=keywordsn.front();E;E=E->next()) {
 			keywords.push_back(E->get());
 		}
-
 	}
 
 	bool CodeCompleteService::Request::valid() const {
@@ -63,8 +66,8 @@ namespace gdexplorer {
 
 		script_text = request.has("text")? request["text"]:"";
 		if (!script_path.empty() && script_text.empty()) {
-			Ref<GDScript> script = ResourceLoader::load(script_path);
-			if (!script.is_null() && script.is_valid() && script->cast_to<GDScript>())
+			Ref<Script> script = ResourceLoader::load(script_path);
+			if (!script.is_null() && script.is_valid() && script->cast_to<Script>())
 				script_text = script->get_source_code();
 		}
 
@@ -83,14 +86,15 @@ namespace gdexplorer {
 			Node *node = EditorNode::get_singleton()->get_tree()->get_edited_scene_root();
 			if(node)
 				node = _find_node_for_script(node, node, request);
-
 			String complete_code = request.script_text;
 			String current_line = _get_text_for_completion(request, complete_code);
-
-			List<String> options;
-			GDScriptLanguage::get_singleton()->complete_code(complete_code, request.script_path.get_base_dir(), node, &options, result.hint);
-			if (options.size()) {
-				result.prefix = _filter_completion_candidates(request.column-1, current_line, options, keywords, result.suggestions);
+			if(!current_line.empty()) {
+				List<String> options;
+#ifdef GDSCRIPT_ENABLED
+				GDScriptLanguage::get_singleton()->complete_code(complete_code, request.script_path.get_base_dir(), node, &options, result.hint);
+#endif
+				if (options.size())
+					result.prefix = _filter_completion_candidates(request.column-1, current_line, options, keywords, result.suggestions);
 			}
 			result.valid = result.prefix.length() > 0;
 		}
@@ -115,9 +119,11 @@ namespace gdexplorer {
 
 	String _get_text_for_completion(const CodeCompleteService::Request& p_request, String& r_text) {
 		Vector<String> substrings = r_text.replace("\r","").split("\n");
-		r_text.clear();
 		const int row = p_request.row - 1;
 		const int len = substrings.size();
+		if(row >= len)
+			return String();
+		r_text.clear();
 		for (int i=0; i<len; i++) {
 			if (i==row) {
 				r_text+=substrings[i].substr(0,p_request.column);
@@ -235,4 +241,3 @@ namespace gdexplorer {
 		return r_suggestions[0];
 	}
 }
-
