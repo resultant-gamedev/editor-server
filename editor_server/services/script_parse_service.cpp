@@ -56,7 +56,6 @@ namespace gdexplorer {
 			GDScript script;
 			script.set_source_code(request.script_text);
 			script.set_script_path(request.script_path);
-			script.set_path(request.script_path);
 
 			GDCompiler compiler;
 			if(OK != compiler.compile(&parser, &script)){
@@ -113,11 +112,6 @@ namespace gdexplorer {
 					result.base_class = result.native_calss;
 				result.is_tool = script.is_tool();
 
-
-//				Node *node = EditorNode::get_singleton()->get_tree()->get_edited_scene_root();
-//				if(node)
-//					_find_nodes_for_script(node, node, result.attached_nodes, request.script_path);
-
 				result.valid = true;
 			}
 #endif
@@ -143,30 +137,14 @@ namespace gdexplorer {
 				mem[mems[i].name] = mems[i].line;
 			return mem;
 		};
-
-		data["members"] = export_members(members);
-		data["functions"] = export_members(functions);
-		data["signals"] = export_members(signals);
-		data["constants"] = export_members(constants);
+		Dictionary m;
+		m["variables"] = export_members(members);
+		m["functions"] = export_members(functions);
+		m["signals"] = export_members(signals);
+		m["constants"] = export_members(constants);
+		data["members"] = m;
 
 		return data;
 	}
 
-	//	void _find_nodes_for_script(Node* p_base, Node* p_current, Vector<String>& r_container,const String& script_path) {
-
-	//		if (p_current->get_owner() != p_base && p_base != p_current)
-	//			return;
-	//		Ref<Script> c = p_current->get_script();
-//		if (!c.is_null() && c.is_valid() && c->get_path() == script_path) {
-//			String path = p_current->get_path();
-//			if(!path.empty()) {
-//				r_container.push_back(path);
-//			}
-//		}
-//		for(int i=0; i < p_current->get_child_count(); i++)
-//			_find_nodes_for_script(p_base, p_current->get_child(i), r_container, script_path);
-//	}
-
 }
-
-
