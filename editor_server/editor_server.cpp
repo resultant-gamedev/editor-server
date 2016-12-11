@@ -191,7 +191,7 @@ namespace gdexplorer {
 			}
 			self->wait_mutex->unlock();
 
-			OS::get_singleton()->delay_usec(100000);
+			OS::get_singleton()->delay_usec(50000);
 		}
 	}
 

@@ -1,9 +1,10 @@
 #include "code_complete_service.h"
 #include <core/os/file_access.h>
-#include <io/resource_loader.h>
 #include <core/globals.h>
-#include <tools/editor/editor_node.h>
 #include <core/list.h>
+#include <core/script_language.h>
+#include <io/resource_loader.h>
+#include <tools/editor/editor_node.h>
 #include <initializer_list>
 
 #ifdef GDSCRIPT_ENABLED
