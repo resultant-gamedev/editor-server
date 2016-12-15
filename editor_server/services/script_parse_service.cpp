@@ -99,8 +99,8 @@ namespace gdexplorer {
 					m.line = script.get_member_line(m.name);
 					result.signals.push_back(m);
 				}
-
-				result.native_calss = script.get_native()->get_name();
+				if(script.get_native().is_valid())
+					result.native_calss = script.get_native()->get_name();
 
 				auto base = script.get_base();
 				if(!base.is_null() && base.is_valid()) {

@@ -184,9 +184,9 @@ namespace gdexplorer {
 			while (self->to_wait.size()) {
 				Thread *w = self->to_wait.front()->get();
 				self->to_wait.erase(w);
-				self->wait_mutex->unlock();
 				Thread::wait_to_finish(w);
-				memdelete(w);
+				if(w)
+					memdelete(w);
 				self->wait_mutex->lock();
 			}
 			self->wait_mutex->unlock();
