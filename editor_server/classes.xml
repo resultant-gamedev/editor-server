@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<doc version="2.2.alpha.custom_build" name="Engine Types">
+<class name="EditorServer" inherits="Object" category="Core">
+	<brief_description>
+	</brief_description>
+	<description>
+		Editor Server provides HTTP server for other tools to get informations from the Godot editor
+		You can get the singleton by Globals.get_singleton('EditorServer')
+	</description>
+	<methods>
+		<method name="register_service">
+			<argument index="0" name="action" type="String">
+				The action means a kind of requests
+			</argument>
+			<argument index="1" name="service" type="EditorServerService">
+				The service to handle the kind of requests
+			</argument>
+			<description>
+				Register a service for the editor server to resove the request from remote tools
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>
+<class name="EditorServerService" inherits="Reference" category="Core">
+	<brief_description>
+	</brief_description>
+	<description>
+		EditorServerService can resove a kind of request action from the Editor Server
+	</description>
+	<methods>
+		<method name="resolve" qualifiers="virtual">
+			<return type="Dictionary">
+			</return>
+			<argument index="0" name="request" type="Dictionary">
+				The request data from remote tools
+			</argument>
+			<description>
+				Resove the action from the editor server it registered to
+			</description>
+		</method>
+	</methods>
+	<constants>
+	</constants>
+</class>
+</doc>
