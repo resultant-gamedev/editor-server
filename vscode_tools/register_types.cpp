@@ -5,6 +5,7 @@
 #include "tools/editor/editor_plugin.h"
 #include "tools/editor/editor_settings.h"
 #include <core/os/file_access.h>
+#include <core/os/dir_access.h>
 
 namespace gdexplorer {
 
@@ -30,6 +31,12 @@ namespace gdexplorer {
 			settings["GodotTools.editorServerPort"] = port;
 			settings["GodotTools.maxNumberOfProblems"] = problem_max;
 
+			DirAccess* dir = DirAccess::create_for_path("res://");
+			if(dir && !dir->dir_exists(".vscode"))
+				dir->make_dir(".vscode");
+			else if (dir)
+				memdelete(dir);
+
 			FileAccess * file = FileAccess::open("res://.vscode/settings.json", FileAccess::WRITE);
 			if(file && file->get_error() == OK) {
 				file->store_string(settings.to_json());
@@ -37,6 +44,8 @@ namespace gdexplorer {
 				memdelete(file);
 			}
 			else {
+				if(file)
+					memdelete(file);
 				ERR_PRINTS("[VSCodeTools]: Generate setting.json failed");
 			}
 		}
