@@ -1,10 +1,10 @@
+#include <core/globals.h>
 #include "editor_server_plugin.h"
 #include "services/service.h"
 #include <tools/editor/editor_settings.h>
 #include "services/editor_action_service.h"
 #include "services/code_complete_service.h"
 #include "services/script_parse_service.h"
-
 namespace gdexplorer {
 	EditorServerPlugin::EditorServerPlugin(EditorNode* pEditor): editor(pEditor) {
 		server = memnew(EditorServer);
@@ -17,7 +17,8 @@ namespace gdexplorer {
 		auto port = EditorSettings::get_singleton()->get("network/editor_server_port");
 		if (port.get_type() == Variant::NIL || !port.is_num())
 			port = 6570;
-		EditorSettings::get_singleton()->set("network/editor_server_port", port);
+		if(!EditorSettings::get_singleton()->has("network/editor_server_port"))
+			EditorSettings::get_singleton()->set("network/editor_server_port", port);
 		m_notificationParam.push_back(EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED);
 		EditorSettings::get_singleton()->connect("settings_changed", this, "_notification", m_notificationParam);
 		Globals::get_singleton()->add_singleton( Globals::Singleton("EditorServer", server));

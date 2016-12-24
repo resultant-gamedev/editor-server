@@ -6,6 +6,8 @@
 #include "tools/editor/editor_settings.h"
 #include <core/os/file_access.h>
 #include <core/os/dir_access.h>
+#include <core/globals.h>
+#include <tools/editor/editor_node.h>
 
 namespace gdexplorer {
 
@@ -14,31 +16,73 @@ namespace gdexplorer {
 		OBJ_TYPE(VSCodeToolsPlugin, EditorPlugin);
 		EditorNode *editor;
 		Vector<Variant> m_notificationParam;
-		Variant port;
-		Variant problem_max;
+		Variant port = 6570;
+		Variant problem_max = 100;
+		Variant highlight_res = true;
+		String reslang = "toml";
+		Vector<String> text_res_exts;
 	protected:
 
 		void _notification(int p_what) {
 			if (p_what == EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED) {
-				port = EditorSettings::get_singleton()->get("network/editor_server_port");
-				problem_max = EditorSettings::get_singleton()->get("vscode/max_number_of_problems");
-				this->_save_settings();
+				Variant port = EditorSettings::get_singleton()->get("network/editor_server_port");
+				Variant problem_max = EditorSettings::get_singleton()->get("vscode/max_number_of_problems");
+				Variant highlight_res = EditorSettings::get_singleton()->get("vscode/highlight_resources");
+				bool changed = this->port != port || this->problem_max != problem_max || this->highlight_res != highlight_res;
+				this->port = port;
+				this->problem_max = problem_max;
+				this->highlight_res = highlight_res;
+				if(changed) {
+					this->_save_settings();
+				}
 			}
 		}
 
 		void _save_settings() {
-			Dictionary settings;
-			settings["GodotTools.editorServerPort"] = port;
-			settings["GodotTools.maxNumberOfProblems"] = problem_max;
-
 			DirAccess* dir = DirAccess::create_for_path("res://");
 			if(dir && !dir->dir_exists(".vscode"))
 				dir->make_dir(".vscode");
-			else if (dir)
+			if(dir)
 				memdelete(dir);
-
-			FileAccess * file = FileAccess::open("res://.vscode/settings.json", FileAccess::WRITE);
+			String configfile = "res://.vscode/settings.json";
+			FileAccess * file  = FileAccess::create_for_path(configfile);
+			int mode = 0;
+			if(file->file_exists(configfile)) {
+				memdelete(file);
+				mode = FileAccess::READ_WRITE;
+				file = FileAccess::open(configfile, FileAccess::READ_WRITE);
+			}
+			else {
+				memdelete(file);
+				mode = FileAccess::WRITE;
+				file = FileAccess::open(configfile, FileAccess::WRITE);
+			}
 			if(file && file->get_error() == OK) {
+				String content;
+
+				Vector<uint8_t> data;
+				int len = int(file->get_len());
+				data.resize(len);
+				file->get_buffer(data.ptr(), len);
+				content.parse_utf8((const char*)data.ptr(), len);
+
+				Dictionary settings;
+				settings.parse_json(content);
+				settings["GodotTools.editorServerPort"] = port;
+				settings["GodotTools.maxNumberOfProblems"] = problem_max;
+				Dictionary associations;
+				if(settings.has("files.associations"))
+					associations = settings["files.associations"];
+				String text_res_lang = highlight_res? reslang : "plaintext";
+				for(int i= 0; i<text_res_exts.size(); ++i)
+					associations[text_res_exts[i]] = text_res_lang;
+				settings["files.associations"] = associations;
+
+				if(mode == FileAccess::READ_WRITE) {
+					file->close();
+					memdelete(file);
+					file = FileAccess::open(configfile, FileAccess::WRITE);
+				}
 				file->store_string(settings.to_json());
 				file->close();
 				memdelete(file);
@@ -51,17 +95,21 @@ namespace gdexplorer {
 		}
 
 		static void _bind_methods() {
-			ObjectTypeDB::bind_method(_MD("_notification","p_what"),&VSCodeToolsPlugin::_notification);
+			ObjectTypeDB::bind_method(_MD("_notification", "p_wath"),&VSCodeToolsPlugin::_notification);
 		}
 
 	public:
 		VSCodeToolsPlugin(EditorNode* pEditor): editor(pEditor) {
-			auto problem_max = EditorSettings::get_singleton()->get("vscode/max_number_of_problems");
-			if (problem_max.get_type() == Variant::NIL || !problem_max.is_num())
-				problem_max = 100;
-			EditorSettings::get_singleton()->set("vscode/max_number_of_problems", problem_max);
+			text_res_exts.push_back("*.tres");
+			text_res_exts.push_back("*.tscn");
+			text_res_exts.push_back("*.cfg");
+			if(!EditorSettings::get_singleton()->has("vscode/max_number_of_problems"))
+				EditorSettings::get_singleton()->set("vscode/max_number_of_problems", problem_max);
+			if(!EditorSettings::get_singleton()->has("vscode/highlight_resources"))
+				EditorSettings::get_singleton()->set("vscode/highlight_resources", highlight_res);
+			m_notificationParam.push_back(EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED);
 			EditorSettings::get_singleton()->connect("settings_changed", this, "_notification", m_notificationParam);
-		};
+		}
 		~VSCodeToolsPlugin() = default;
 	};
 }
