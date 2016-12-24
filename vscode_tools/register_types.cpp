@@ -8,6 +8,7 @@
 #include <core/os/dir_access.h>
 #include <core/globals.h>
 #include <tools/editor/editor_node.h>
+#include "modules/editor_server/services/editor_action_service.h"
 
 namespace gdexplorer {
 
@@ -45,6 +46,7 @@ namespace gdexplorer {
 			if(dir)
 				memdelete(dir);
 			String configfile = "res://.vscode/settings.json";
+			String docfile = "res://.vscode/classes.json";
 			FileAccess * file  = FileAccess::create_for_path(configfile);
 			int mode = 0;
 			if(file->file_exists(configfile)) {
@@ -86,6 +88,13 @@ namespace gdexplorer {
 				file->store_string(settings.to_json());
 				file->close();
 				memdelete(file);
+
+				// Generate doc data into json
+				EditorActionService eas;
+				Dictionary action;
+				action["command"] = "gendoc";
+				action["path"] = docfile;
+				eas.resolve(action);
 			}
 			else {
 				if(file)
