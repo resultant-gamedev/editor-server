@@ -6,6 +6,7 @@
 #include "tools/editor/editor_settings.h"
 #include <core/os/file_access.h>
 #include <core/os/dir_access.h>
+#include <core/os/os.h>
 #include <core/globals.h>
 #include <tools/editor/editor_node.h>
 #include "modules/editor_server/services/editor_action_service.h"
@@ -72,6 +73,7 @@ namespace gdexplorer {
 				settings.parse_json(content);
 				settings["GodotTools.editorServerPort"] = port;
 				settings["GodotTools.maxNumberOfProblems"] = problem_max;
+				settings["GodotTools.editorPath"] = OS::get_singleton()->get_executable_path();
 				Dictionary associations;
 				if(settings.has("files.associations"))
 					associations = settings["files.associations"];
