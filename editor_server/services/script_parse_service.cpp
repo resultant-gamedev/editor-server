@@ -25,7 +25,7 @@ namespace gdexplorer {
 
 	ScriptParseService::Request::Request(const Dictionary &request) {
 		String path = request.has("path")? request["path"]:"";
-		path = Globals::get_singleton()->localize_path(path);
+		path = GlobalConfig::get_singleton()->localize_path(path);
 		if(path == "res://" || !path.begins_with("res://"))
 			path = "";
 		script_path = path;

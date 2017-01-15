@@ -10,7 +10,7 @@
 namespace gdexplorer {
 
 	class EditorServer : public Object {
-		OBJ_TYPE(EditorServer, Object);
+		GDCLASS(EditorServer, Object);
 
 		enum Command {
 			CMD_NONE,

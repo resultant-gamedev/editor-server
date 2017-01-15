@@ -5,7 +5,7 @@
 
 namespace gdexplorer {
 	class ScriptParseService : public EditorServerService {
-		OBJ_TYPE(ScriptParseService,EditorServerService);
+		GDCLASS(ScriptParseService,EditorServerService);
 		using super = EditorServerService;
 	protected:
 		struct Error {

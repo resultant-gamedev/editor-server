@@ -5,6 +5,8 @@
 #include "services/editor_action_service.h"
 #include "services/code_complete_service.h"
 #include "services/script_parse_service.h"
+#include <core/globals.h>
+
 namespace gdexplorer {
 	EditorServerPlugin::EditorServerPlugin(EditorNode* pEditor): editor(pEditor) {
 		server = memnew(EditorServer);
@@ -21,7 +23,7 @@ namespace gdexplorer {
 			EditorSettings::get_singleton()->set("network/editor_server_port", port);
 		m_notificationParam.push_back(EditorSettings::NOTIFICATION_EDITOR_SETTINGS_CHANGED);
 		EditorSettings::get_singleton()->connect("settings_changed", this, "_notification", m_notificationParam);
-		Globals::get_singleton()->add_singleton( Globals::Singleton("EditorServer", server));
+		GlobalConfig::get_singleton()->add_singleton( GlobalConfig::Singleton("EditorServer", server));
 	}
 
 	EditorServerPlugin::~EditorServerPlugin() {
@@ -51,7 +53,7 @@ namespace gdexplorer {
 	}
 
 	void EditorServerPlugin::_bind_methods() {
-		ObjectTypeDB::bind_method(_MD("_notification","p_what"),&EditorServerPlugin::_notification);
+		ClassDB::bind_method(_MD("_notification","p_what"),&EditorServerPlugin::_notification);
 	}
 }
 

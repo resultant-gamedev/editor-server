@@ -4,7 +4,7 @@ namespace gdexplorer {
 
 
 	void EditorServerService::_bind_methods() {
-		ObjectTypeDB::add_virtual_method(get_type_static(),MethodInfo(Variant::DICTIONARY,"resolve",PropertyInfo(Variant::DICTIONARY,"request")));
+		ClassDB::add_virtual_method(get_class_static(), MethodInfo(Variant::DICTIONARY,"resolve",PropertyInfo(Variant::DICTIONARY,"request")));
 	}
 
 	Dictionary EditorServerService::resolve(const Dictionary &data) const {

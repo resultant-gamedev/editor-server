@@ -7,7 +7,7 @@
 namespace gdexplorer {
 
 	class EditorServerService : public Reference {
-		OBJ_TYPE(EditorServerService, Reference);
+		GDCLASS(EditorServerService, Reference);
 	protected:
 		static void _bind_methods();
 	public:

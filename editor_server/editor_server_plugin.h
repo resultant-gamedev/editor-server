@@ -8,7 +8,7 @@ namespace gdexplorer {
 
 	class EditorServerPlugin : public EditorPlugin
 	{
-		OBJ_TYPE(EditorServerPlugin, EditorPlugin);
+		GDCLASS(EditorServerPlugin, EditorPlugin);
 		EditorNode *editor;
 		EditorServer *server;
 		Vector<Variant> m_notificationParam;

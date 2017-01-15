@@ -8,6 +8,7 @@
 #include <core/os/dir_access.h>
 #include <core/os/os.h>
 #include <core/globals.h>
+#include <core/io/json.h>
 #include <tools/editor/editor_node.h>
 #include "modules/editor_server/services/editor_action_service.h"
 
@@ -15,7 +16,7 @@ namespace gdexplorer {
 
 	class VSCodeToolsPlugin : public EditorPlugin
 	{
-		OBJ_TYPE(VSCodeToolsPlugin, EditorPlugin);
+		GDCLASS(VSCodeToolsPlugin, EditorPlugin);
 		EditorNode *editor;
 		Vector<Variant> m_notificationParam;
 		Variant port = 6570;
@@ -70,24 +71,28 @@ namespace gdexplorer {
 				content.parse_utf8((const char*)data.ptr(), len);
 
 				Dictionary settings;
-				settings.parse_json(content);
-				settings["GodotTools.editorServerPort"] = port;
-				settings["GodotTools.maxNumberOfProblems"] = problem_max;
-				settings["GodotTools.editorPath"] = OS::get_singleton()->get_executable_path();
-				Dictionary associations;
-				if(settings.has("files.associations"))
-					associations = settings["files.associations"];
-				String text_res_lang = highlight_res? reslang : "plaintext";
-				for(int i= 0; i<text_res_exts.size(); ++i)
-					associations[text_res_exts[i]] = text_res_lang;
-				settings["files.associations"] = associations;
-
+				Variant _settings;
+				String errstr;
+				int errline = -1;
+				if(OK == JSON::parse(content,_settings, errstr, errline)) {
+					settings = _settings;
+					settings["GodotTools.editorServerPort"] = port;
+					settings["GodotTools.maxNumberOfProblems"] = problem_max;
+					settings["GodotTools.editorPath"] = OS::get_singleton()->get_executable_path();
+					Dictionary associations;
+					if(settings.has("files.associations"))
+						associations = settings["files.associations"];
+					String text_res_lang = highlight_res? reslang : "plaintext";
+					for(int i= 0; i<text_res_exts.size(); ++i)
+						associations[text_res_exts[i]] = text_res_lang;
+					settings["files.associations"] = associations;
+				}
 				if(mode == FileAccess::READ_WRITE) {
 					file->close();
 					memdelete(file);
 					file = FileAccess::open(configfile, FileAccess::WRITE);
 				}
-				file->store_string(settings.to_json());
+				file->store_string(JSON::print(settings));
 				file->close();
 				memdelete(file);
 
@@ -106,7 +111,7 @@ namespace gdexplorer {
 		}
 
 		static void _bind_methods() {
-			ObjectTypeDB::bind_method(_MD("_notification", "p_wath"),&VSCodeToolsPlugin::_notification);
+			ClassDB::bind_method(_MD("_notification", "p_wath"),&VSCodeToolsPlugin::_notification);
 		}
 
 	public:

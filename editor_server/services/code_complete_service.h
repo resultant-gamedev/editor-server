@@ -6,7 +6,7 @@
 namespace gdexplorer {
 	class CodeCompleteService : public EditorServerService
 	{
-		OBJ_TYPE(CodeCompleteService,EditorServerService);
+		GDCLASS(CodeCompleteService,EditorServerService);
 		using super = EditorServerService;
 	protected:
 		mutable List<String> keywords;

@@ -11,8 +11,8 @@ using namespace gdexplorer;
 void register_editor_server_types() {
 #ifdef EDITOR_SERVICE
 	EditorPlugins::add_by_type<EditorServerPlugin>();
-	ObjectTypeDB::register_type<EditorServer>();
-	ObjectTypeDB::register_type<EditorServerService>();
+	ClassDB::register_class<EditorServer>();
+	ClassDB::register_class<EditorServerService>();
 #endif
 }
 

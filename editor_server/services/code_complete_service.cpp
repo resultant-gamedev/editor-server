@@ -48,7 +48,7 @@ namespace gdexplorer {
 			keywords.push_back(_keyword);
 		}
 		List<StringName> keywordsn;
-		ObjectTypeDB::get_type_list(&keywordsn);
+		ClassDB::get_class_list(&keywordsn);
 		for(List<StringName>::Element *E=keywordsn.front();E;E=E->next()) {
 			keywords.push_back(E->get());
 		}
@@ -60,7 +60,7 @@ namespace gdexplorer {
 
 	CodeCompleteService::Request::Request(const Dictionary &request):row(1), column(1), script_text(""), script_path("") {
 		String path = request.has("path")? request["path"]:"";
-		path = Globals::get_singleton()->localize_path(path);
+		path = GlobalConfig::get_singleton()->localize_path(path);
 		if(path == "res://" || !path.begins_with("res://"))
 			path = "";
 		script_path = path;

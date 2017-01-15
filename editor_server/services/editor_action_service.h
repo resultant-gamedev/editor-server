@@ -6,7 +6,7 @@
 namespace gdexplorer {
 	class EditorActionService : public EditorServerService
 	{
-		OBJ_TYPE(EditorActionService, EditorServerService);
+		GDCLASS(EditorActionService, EditorServerService);
 		using super = EditorServerService;
 	public:
 		virtual Dictionary resolve(const Dictionary& data) const override;

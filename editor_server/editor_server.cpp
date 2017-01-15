@@ -1,7 +1,8 @@
 #include "editor_server.h"
-#include "os/file_access.h"
-#include "globals.h"
-#include "tools/editor/editor_settings.h"
+#include <os/file_access.h>
+#include <core/globals.h>
+#include <core/io/json.h>
+#include <tools/editor/editor_settings.h>
 
 #define CLOSE_CLIENT_COND(m_cond, m_cd) \
 { if ( m_cond ) {	\
@@ -12,7 +13,7 @@
 namespace gdexplorer {
 
 	void EditorServer::_close_client(EditorServer::ClientData *cd) {
-		cd->connection->disconnect();
+		cd->connection->disconnect_from_host();
 		cd->server->wait_mutex->lock();
 		cd->server->to_wait.insert(cd->thread);
 		cd->server->wait_mutex->unlock();
@@ -105,8 +106,10 @@ namespace gdexplorer {
 							}
 
 							// Read and parse body as json
-							Dictionary data;
-							Error parse_err = data.parse_json(request.read_utf8_body());
+							Variant _data;
+							String errmsg;
+							int errline = -1;
+							Error parse_err = JSON::parse(request.read_utf8_body(), _data, errmsg, errline);
 							if (parse_err != OK) {
 								request.response.status = "400 Bad Request";
 								request.response.set_header("Accept", "application/json");
@@ -114,6 +117,7 @@ namespace gdexplorer {
 								request.send_response();
 								break;
 							}
+							Dictionary data = _data;
 							if (!data.has("action")) {
 								data["error"] = "No action found in the request body";
 							}
@@ -133,7 +137,7 @@ namespace gdexplorer {
 							// Done! Deliver <3
 							request.response.status = "200 OK";
 							request.response.set_header("Content-Type", "application/json; charset=UTF-8");
-							request.send_response(data.to_json());
+							request.send_response(JSON::print(data));
 
 						} break;
 					default: {
@@ -196,7 +200,7 @@ namespace gdexplorer {
 	}
 
 	void EditorServer::_bind_methods() {
-		ObjectTypeDB::bind_method(_MD("register_service", "action:String", "service:EditorServerService"), &EditorServer::register_service);
+		ClassDB::bind_method(_MD("register_service", "action:String", "service:EditorServerService"), &EditorServer::register_service);
 	}
 
 	void EditorServer::start(int port) {

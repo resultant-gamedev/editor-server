@@ -2,6 +2,7 @@
 #include <core/os/os.h>
 #include <core/globals.h>
 #include <core/os/os.h>
+#include <core/io/json.h>
 #include <tools/doc/doc_data.h>
 #include <tools/editor/editor_help.h>
 
@@ -19,7 +20,7 @@ namespace gdexplorer {
 				OS::get_singleton()->alert(content, title);
 			}
 			else if(command == "projectdir") {
-				data["path"] = Globals::get_singleton()->globalize_path("res://");
+				data["path"] = GlobalConfig::get_singleton()->globalize_path("res://");
 			}
 			else if(command == "editorpath") {
 				data["path"] = OS::get_singleton()->get_executable_path();
@@ -37,7 +38,7 @@ namespace gdexplorer {
 					Dictionary docdata = _resolveDocData(doc);
 					FileAccess* file = FileAccess::open(path, FileAccess::WRITE);
 					if(file && file->get_error() == OK) {
-						file->store_string(docdata.to_json());
+						file->store_string(JSON::print(docdata));
 						file->close();
 						done = file->get_error() == OK;
 						memdelete(file);
